@@ -1,0 +1,26 @@
+# stupid startup crap
+startup_message off
+
+vbell off
+
+# Change scrollback to 10000 lines
+defscrollback 10000
+
+# Wait 5 seconds before displaying new message if one is currently being displayed.
+msgminwait 5
+# Show message for 5 seconds
+msgwait 5
+
+caption always "%?%F%{= kB}* %:%{= kw}  %?%n %t: %h"
+
+hardstatus on
+hardstatus alwayslastline
+# %{= kG}[%{B} %d/%m %{W}%c %{g}] <-- on black background display bolded green date (%d/%m) and bolded white time (%c)
+# [ %{G}%l %H %{g}] <-- display green load and hostname
+# [%{= kw}%?%-Lw%? <-- switch to white and conditionally display all windows (%w) up to the current one (that's the -) with their flags (that's the L)
+# %{r}(%{W}%n*%f%t%?(%u)%?%{r}) <-- in red parenthises, display in white <window number>*<flags><title><other users in parenthises if there are any>
+# %{w}%?%+Lw%?%?%{g}] <-- switch to white and conditionally display all windows (%w) after the current one (that's the +) with their flags (that's the L)
+hardstatus string "%{= kG}[%{B} %d/%m %{W}%c %{g}][ %{G}%l %H %{g}][%{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%{g}]"
+
+termcapinfo xterm|xterms|xs|rxvt|konsole ti@:te@
+

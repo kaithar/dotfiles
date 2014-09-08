@@ -1,0 +1,60 @@
+[user]
+	name = Daniel Bradshaw
+
+[diff]
+#        external = git_diff_wrapper
+[color]
+	ui = auto
+
+[pull]
+        rebase = true
+
+[alias]
+# from https://github.com/janmoesen/tilde/blob/master/.gitconfig
+	# When doing "git git log" or some such, do not complain about "git" not
+	# being a valid Git command. This happens when copy-pasting examples, for
+	# instance.
+	git = !git
+
+	# Show the staged changes.
+	dc = diff --cached
+
+	# Switch branches, creating them if necessary. I want to unlearn using
+	# "git checkout" for switching between branches because of the possible
+	# dataloss when not paying attention. (You could see the PEBKAC, but I
+	# could reply with another four letter acronym, slightly resembling TOFU.)
+	#
+	# Suppose I have modified a file named "password" and have two branches,
+	# "password-expiry-mechanism" and "password-reset-mail". If I want to
+	# switch to either branch, I would type "git checkout pass<Tab><Enter>",
+	# but the autocomplete would stop at "git checkout password" because of
+	# the ambiguity. Because I press <Enter> without really thinking, I have
+	# now reset my "password" file. With "git go pass<Tab><Enter>", I would
+	# simply have created a new branch called "password". (I would be forced
+	# to use "--" to separate paths from banch names, which is a Good Thing™.)
+	go = checkout -B
+
+	# Make "git grep" look a bit like "ack"/"ag". Note that you need to
+	# specify --no-index to search all files, and that submodules are not
+	# searched.
+	ack = grep --extended-regexp --break --heading --line-number
+# end theft
+
+#From https://github.com/gf3/dotfiles/blob/master/.gitconfig
+[color "branch"]
+  current = yellow reverse
+  local   = yellow
+  remote  = green
+
+[color "diff"]
+  meta = yellow 
+  frag = magenta 
+  old  = red 
+  new  = green 
+
+[color "status"]
+  added     = yellow
+  changed   = green
+  untracked = cyan
+# end theft
+

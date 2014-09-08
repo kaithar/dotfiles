@@ -1,0 +1,8 @@
+Host *
+        ControlMaster auto
+        ControlPath ~/synced/.ssh_master/%l_%r_%h_%p
+        ForwardAgent no
+        ServerAliveInterval 30
+        ServerAliveCountMax 10
+        HashKnownHosts no
+
