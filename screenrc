@@ -23,4 +23,9 @@ hardstatus alwayslastline
 hardstatus string "%{= kG}[%{B} %d/%m %{W}%c %{g}][ %{G}%l %H %{g}][%{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%{g}]"
 
 termcapinfo xterm|xterms|xs|rxvt|konsole ti@:te@
-
+termcapinfo xterm|xterms|xs|rxvt|konsole Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm
+defutf8 on
+# Erase background with current bg color
+defbce on
+# # Advertise 256 color support to inner applications
+term screen-256color-bce

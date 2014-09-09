@@ -17,3 +17,4 @@ map <esc>Oc w
 imap <esc>Od <C-O>b
 imap <esc>Oc <C-O>w
 
+set expandtab

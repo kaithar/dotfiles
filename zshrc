@@ -14,6 +14,7 @@ EDITOR=/usr/bin/vim
 HISTFILE=~/.histfile
 HISTSIZE=1000000000
 SAVEHIST=1000000000
+PATH=/usr/lib/colorgcc/bin:$PATH
 
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
 setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY
@@ -33,6 +34,19 @@ bindkey "\e[F" vi-end-of-line # End
 
 RAN=0
 BTICK='\`'
+
+function ssh-reagent {
+  for agent in /tmp/ssh-*/agent.*; do
+    export SSH_AUTH_SOCK=$agent
+    if ssh-add -l 2>&1 > /dev/null; then
+      echo 'Found working SSH Agent:'
+      ssh-add -l
+      return
+    fi
+  done
+  echo 'Cannot find ssh agent - maybe you should reconnect and forward it?'
+}
+
 
 function title {
   if [[ $TERM == "screen" ]]; then
