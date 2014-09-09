@@ -4,6 +4,7 @@ set encoding=utf-8
 
 "" Basic Config
 set number                      " line numbers (number|nonumber)
+set numberwidth=6               " Minimal number of columns of the line number
 set ruler                       " show the cursor position all the time
 set cursorline                  " highlight the line of the cursor
 set showcmd                     " display incomplete commands
@@ -101,6 +102,8 @@ if has("statusline") && !&cp
   set statusline+=\ [%b][0x%B]
 endif
 
+" Tab list
+set tabline=%!ShortTabLine()
 
 syntax on
 color slate
@@ -142,4 +145,41 @@ imap <esc>[5C <C-O>w
 set expandtab
 
 set tags+=./tags;/
+
+" Completion
+set completeopt=longest,menu,preview " Brings a cool completion view
+set wildmode=list:longest,full " Autocompletion settings
+
+" tabline setup
+function! ShortTabLine()
+    let ret = ''
+    for i in range(tabpagenr('$'))
+  "Select the color group for highlighting active tab
+  if i + 1 == tabpagenr()
+      let ret .= '%#errorMsg#'
+  else
+      let ret .= '%#TabLine#'
+  endif
+
+  "Find the buffername for the tablabel
+  let buflist = tabpagebuflist(i+1)
+  let winnr = tabpagewinnr(i+1)
+  let buffername = bufname(buflist[winnr - 1])
+  let filename = fnamemodify(buffername, ':t')
+  "Check if there is no name
+  if filename == ''
+      let filename = 'noname'
+  endif
+  if strlen(filename) >= 8
+      let ret .= '['.filename[0:4].'..]'
+  else
+      let ret .= '['.filename.']'
+  endif
+    endfor
+
+  "After the last tab fill with TabLineFill and reset tab page #
+  let ret .= '%#TabLineFill#%T'
+  return ret
+endfunction
+
 " vim: set ft=vim noet tw=78 ai :
