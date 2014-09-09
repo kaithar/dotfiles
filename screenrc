@@ -11,6 +11,15 @@ msgminwait 5
 # Show message for 5 seconds
 msgwait 5
 
+# Bind F11 and F12 (NOT F1 and F2) to previous and next screen window. (F1 and
+# F2 would be "bindkey -k k1 prev" and "bindkey -k -k2 next", for some reason.)
+bindkey -k F1 prev
+bindkey -k F2 next
+
+# If the terminal client (ssh, putty, whatever) stops accepting data from screen, don't block indefinitely.
+# This is out going (screen to user) not incoming (screen to child process)
+nonblock on
+
 caption always "%?%F%{= kB}* %:%{= kw}  %?%n %t: %h"
 
 hardstatus on
