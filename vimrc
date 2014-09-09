@@ -18,3 +18,5 @@ imap <esc>Od <C-O>b
 imap <esc>Oc <C-O>w
 
 set expandtab
+
+set tags+=./tags;/
