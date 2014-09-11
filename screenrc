@@ -32,6 +32,17 @@ bindkey -k k7 select 7
 bindkey -k k8 select 8
 bindkey -k k9 source /home/nazca/.screenrc
 
+# Make F10 override bindings ... I have no idea why they called F10 'k;'
+bindkey -k k; mapdefault
+
+# Alternative F1-F5 sequences for when termcap lies.
+# Make it stuff the right keys
+bindkey -d "^[[[A" stuff \033OP
+bindkey -d "^[[[B" stuff \033OQ
+bindkey -d "^[[[C" stuff \033OR
+bindkey -d "^[[[D" stuff \033OS
+bindkey -d "^[[[E" stuff \033[15~
+
 bindkey "^[[[A" select 1
 bindkey "^[[[B" select 2
 bindkey "^[[[C" select 3
