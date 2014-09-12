@@ -58,8 +58,10 @@ bindkey -k F2 next
 # This is out going (screen to user) not incoming (screen to child process)
 nonblock on
 
+# Can use 256 colours via ^[[48;5;17m and reset colours with ^[[0m
+
 caption always
-caption string "%?%F%{= kB}* %:%{= kw}  %?%n %t: %h"
+caption string "%{= kw}  %?%F%{= kB}* %:  %?%n %t: %h"
 
 hardstatus on
 hardstatus alwayslastline
@@ -68,7 +70,7 @@ hardstatus alwayslastline
 # [%{= kw}%?%-Lw%? <-- switch to white and conditionally display all windows (%w) up to the current one (that's the -) with their flags (that's the L)
 # %{r}(%{W}%n*%f%t%?(%u)%?%{r}) <-- in red parenthises, display in white <window number>*<flags><title><other users in parenthises if there are any>
 # %{w}%?%+Lw%?%?%{g}] <-- switch to white and conditionally display all windows (%w) after the current one (that's the +) with their flags (that's the L)
-hardstatus string "%{= kG}[%{B} %d/%m %{W}%c %{g}][ %{G}%l %H %{g}][%{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%{g}]"
+hardstatus string "  %{= kG}[%{B} %d/%m %{W}%c %{g}][ %{G}%l %H %{g}][ %{= .w}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%{g} ]"
 
 bind c screen 1
 bind ^c screen 1
