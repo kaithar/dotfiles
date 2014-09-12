@@ -66,7 +66,17 @@ function preexec {
   emulate -L zsh
   local -a cmd; cmd=(${(z)1})
   title $cmd[1]:t "$cmd[2,-1]"
+
 }
+
+function _-accept-line()
+{
+    emulate -L zsh
+    # PROMPT="test"
+    zle reset-prompt
+    zle .accept-line
+}
+zle -N accept-line _-accept-line
 
 function precmd {
   local errno=$?
