@@ -17,7 +17,7 @@ SAVEHIST=1000000000
 PATH=/usr/lib/colorgcc/bin:$PATH
 
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
-setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY
+setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY EXTENDED_HISTORY transientrprompt
 
 alias ls="ls --color=always"
 alias grep='grep --colour=auto'
