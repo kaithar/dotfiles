@@ -69,6 +69,8 @@ function preexec {
 
 }
 
+# This is based on the (not entirely related) code provided for doing the same thing as `transientrprompt` here:
+# http://stackoverflow.com/questions/14316463/zsh-clear-rps1-before-adding-line-to-linebuffer
 function _-accept-line()
 {
     emulate -L zsh
