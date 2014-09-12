@@ -54,6 +54,11 @@ bindkey "^[[[E" select 5
 bindkey -k F1 prev
 bindkey -k F2 next
 
+# From https://github.com/dvincelli/dotfiles/blob/master/screenrc
+# make + and - resize the window
+bind + resize +3
+bind - resize -3
+
 # If the terminal client (ssh, putty, whatever) stops accepting data from screen, don't block indefinitely.
 # This is out going (screen to user) not incoming (screen to child process)
 nonblock on
