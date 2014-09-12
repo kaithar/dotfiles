@@ -81,21 +81,21 @@ zle -N accept-line _-accept-line
 function precmd {
   local errno=$?
   PROMPT=""
+  typeset -a PROMPT_PARTS
   if [[ ($errno -gt 0) && ($RAN -eq 1)]] {
-    PROMPT+="%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>
-"
+    PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>")
     RAN=0
   }
-  PROMPT+="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
-  PROMPT+="%B%F{green}%T%b%F{cyan} ---- " #<-- Date
+  PROMPT_LINE="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
+  PROMPT_LINE+="%B%F{green}%T%b%F{cyan} ---- " #<-- Date
   if [[ ($EUID -eq 0) || ("$USER" == 'root')]] {
-    PROMPT+="%B%F{red}%m%b " #<-- Host
+    PROMPT_LINE+="%B%F{red}%m%b " #<-- Host
   } else {
-    PROMPT+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- User @ Host
+    PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- User @ Host
   }
-  PROMPT+="%2(j.%F{cyan}---- %F{green}%j Jobs ."
-  PROMPT+="%1(j@%F{cyan}---- %F{green}1 Job @)"
-  PROMPT+=")%F{cyan}---- "
+  PROMPT_LINE+="%2(j.%F{cyan}---- %F{green}%j Jobs ."
+  PROMPT_LINE+="%1(j@%F{cyan}---- %F{green}1 Job @)"
+  PROMPT_LINE+=")%F{cyan}---- "
 
   PWD=`pwd`
   dir=${PWD/$HOME/\~}
@@ -147,25 +147,23 @@ function precmd {
     result_bw+="/$part"
     shift tree
   }
-  PROMPT+=${result:-/}
-  PROMPT+="%b"
+  PROMPT_LINE+=${result:-/}
+  PROMPT_LINE+="%b"
+  PROMPT_PARTS+=($PROMPT_LINE)
   if [[ -d .svn ]] {
     svn_repo=`head -n 6 .svn/entries | tail -n 1`
-    PROMPT+="
-%F{red}# %F{cyan}{----%b %F{green}SVN repo: %F{yellow}${svn_repo}"
+    PROMPT_PARTS+=("%F{red}# %F{cyan}{----%b %F{green}SVN repo: %F{yellow}${svn_repo}")
   }
   if ($F_GIT) {
     git_path=`git remote -v |grep fetch|sed -E 's/\t/ /g'|cut -f2 -d' '|sed ':s;N;s/\n/, /;t s;'`
-    PROMPT+="
-%F{red}# %F{cyan}{----%b %F{green}Git repo: %F{yellow}${git_path}"
+    PROMPT_PARTS+=('%F{red}# %F{cyan}{----%b %F{green}Git repo: %F{yellow}${git_path}')
   }
   if ($F_HG) {
     hg_path=`hg paths|cut -f3- -d' '`
-    PROMPT+="
-%F{red}# %F{cyan}{----%b %F{green}HG repo: %F{yellow}${hg_path}"
+    PROMPT_PARTS+=("%F{red}# %F{cyan}{----%b %F{green}HG repo: %F{yellow}${hg_path}")
   }
-  PROMPT+="
-%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}"
+  PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}")
+  PROMPT=${(pj:\n:)PROMPT_PARTS}
   title "zsh in $result_bw"
 }
 
