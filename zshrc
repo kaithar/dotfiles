@@ -34,6 +34,7 @@ bindkey "\e[F" vi-end-of-line # End
 
 RAN=0
 BTICK='\`'
+ESC=`echo "\e"`
 
 function ssh-reagent {
   for agent in /tmp/ssh-*/agent.*; do
@@ -73,27 +74,40 @@ function preexec {
 # http://stackoverflow.com/questions/14316463/zsh-clear-rps1-before-adding-line-to-linebuffer
 function _-accept-line()
 {
+    TMOUT=0
     emulate -L zsh
-    # PROMPT="test"
+    PROMPT=$COLLAPSED_PROMPT
     zle reset-prompt
     zle .accept-line
 }
 zle -N accept-line _-accept-line
 
+TRAPALRM() {
+    zle reset-prompt
+}
+
+
 function precmd {
+RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   local errno=$?
   PROMPT=""
   typeset -a PROMPT_PARTS
+  typeset -a COLLAPSED_PROMPT_PARTS
+  COLLAPSED_PROMPT=""
   if [[ ($errno -gt 0) && ($RAN -eq 1)]] {
     PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>")
+    COLLAPSED_PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>")
     RAN=0
   }
-  PROMPT_LINE="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
-  PROMPT_LINE+="%B%F{green}%T%b%F{cyan} ---- " #<-- Date
+  PROMPT_PARTS+=('%{${ESC}[48;5;17m%}%E')
+  PROMPT_LINE="%{${ESC}[0m%}%F{red}#  %B%F{cyan}.%b%F{cyan}---- (%y) ($SHLVL deep) "
+  COLLAPSED_PROMPT_LINE="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
   if [[ ($EUID -eq 0) || ("$USER" == 'root')]] {
     PROMPT_LINE+="%B%F{red}%m%b " #<-- Host
+    COLLAPSED_PROMPT_LINE+="%B%F{red}root %F{white}@ %F{red}%m%b " #<-- root@Host
   } else {
     PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- User @ Host
+    COLLAPSED_PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- root@Host
   }
   PROMPT_LINE+="%2(j.%F{cyan}---- %F{green}%j Jobs ."
   PROMPT_LINE+="%1(j@%F{cyan}---- %F{green}1 Job @)"
@@ -151,21 +165,30 @@ function precmd {
   }
   PROMPT_LINE+=${result:-/}
   PROMPT_LINE+="%b"
+  COLLAPSED_PROMPT_LINE+=": "${result:-/}
+  COLLAPSED_PROMPT_LINE+="%b"
   PROMPT_PARTS+=($PROMPT_LINE)
+  COLLAPSED_PROMPT_PARTS+=($COLLAPSED_PROMPT_LINE)
   if [[ -d .svn ]] {
     svn_repo=`head -n 6 .svn/entries | tail -n 1`
-    PROMPT_PARTS+=("%F{red}# %F{cyan}{----%b %F{green}SVN repo: %F{yellow}${svn_repo}")
+    PROMPT_PARTS+=("%F{red}# %F{cyan}{-----%b %F{green}SVN repo: %F{yellow}${svn_repo}")
   }
   if ($F_GIT) {
     git_path=`git remote -v |grep fetch|sed -E 's/\t/ /g'|cut -f2 -d' '|sed ':s;N;s/\n/, /;t s;'`
-    PROMPT_PARTS+=('%F{red}# %F{cyan}{----%b %F{green}Git repo: %F{yellow}${git_path}')
+    PROMPT_PARTS+=('%F{red}# %F{cyan}{-----%b %F{green}Git repo: %F{yellow}${git_path}')
   }
   if ($F_HG) {
     hg_path=`hg paths|cut -f3- -d' '`
-    PROMPT_PARTS+=("%F{red}# %F{cyan}{----%b %F{green}HG repo: %F{yellow}${hg_path}")
+    PROMPT_PARTS+=("%F{red}# %F{cyan}{-----%b %F{green}HG repo: %F{yellow}${hg_path}")
   }
   PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}")
+  COLLAPSED_PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}")
   PROMPT=${(pj:\n:)PROMPT_PARTS}
+  COLLAPSED_PROMPT=${(pj:\n:)COLLAPSED_PROMPT_PARTS}
   title "zsh in $result_bw"
+  if [[ ! -z $DISPLAY ]]
+  {
+    TMOUT=1
+  }
 }
 
