@@ -82,11 +82,6 @@ function _-accept-line()
 }
 zle -N accept-line _-accept-line
 
-TRAPALRM() {
-    zle reset-prompt
-}
-
-
 function precmd {
 RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   local errno=$?
@@ -186,9 +181,5 @@ RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   PROMPT=${(pj:\n:)PROMPT_PARTS}
   COLLAPSED_PROMPT=${(pj:\n:)COLLAPSED_PROMPT_PARTS}
   title "zsh in $result_bw"
-  if [[ ! -z $DISPLAY ]]
-  {
-    TMOUT=1
-  }
 }
 
