@@ -36,18 +36,39 @@ RAN=0
 BTICK='\`'
 ESC=`echo "\e"`
 
-function ssh-reagent {
-  for agent in /tmp/ssh-*/agent.*; do
-    export SSH_AUTH_SOCK=$agent
-    if ssh-add -l 2>&1 > /dev/null; then
-      echo 'Found working SSH Agent:'
-      ssh-add -l
-      return
-    fi
-  done
-  echo 'Cannot find ssh agent - maybe you should reconnect and forward it?'
+function _ssh-reagent {
+  ls /tmp | grep ssh- 2>&1 > /dev/null
+  if [[ $? == 0 ]]; then
+    for agent in /tmp/ssh-*/agent.*; do
+      export SSH_AUTH_SOCK=$agent
+      ssh-add -l 2>&1 > /dev/null
+      return $?
+      if [ $? != 2 ]; then
+        return
+      fi
+    done
+  fi
+  return 2
 }
 
+function ssh-reagent {
+  _ssh-reagent
+  case $? in
+    2)
+      echo 'Cannot find ssh agent, starting one'
+      eval `ssh-agent -s`
+      echo '';&
+    1)
+      echo 'No keys found, adding some.'
+      ssh-add
+      echo '';&
+    0)
+      echo 'Found working SSH Agent:'
+      ssh-add -l;;
+  esac
+}
+
+ssh-reagent
 
 function title {
   if [[ $TERM == "screen" ]]; then
