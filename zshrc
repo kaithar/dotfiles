@@ -68,7 +68,7 @@ function ssh-reagent {
   esac
 }
 
-ssh-reagent
+ssh-reagent > /dev/null
 
 function title {
   if [[ $TERM == "screen" ]]; then
