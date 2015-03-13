@@ -4,6 +4,7 @@ zstyle :compinstall filename '~/.zshrc'
 
 autoload -Uz compinit
 compinit
+compdef git-achievements=git
 
 setopt COMPLETE_IN_WORD
 
@@ -16,11 +17,16 @@ HISTSIZE=1000000000
 SAVEHIST=1000000000
 PATH=/usr/lib/colorgcc/bin:$PATH
 
+export LESS='-R'
+export LESSOPEN='|~/.lessfilter %s'
+
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
 setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY EXTENDED_HISTORY transientrprompt
 
 alias ls="ls --color=always"
 alias grep='grep --colour=auto'
+alias vi=vim
+alias esed="sed -r"
 
 bindkey "\e[1~" vi-beginning-of-line # Home
 bindkey "\e[2~" list-choices # Insert

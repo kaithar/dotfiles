@@ -9,6 +9,14 @@
 [pull]
         rebase = true
 
+# from https://github.com/lstrojny/.lars/blob/master/dot-gitconfig
+[core]
+    excludesfile = ~/.gitignore_global
+
+[pull]
+    rebase = true
+# end theft
+
 [alias]
 # from https://github.com/janmoesen/tilde/blob/master/.gitconfig
 	# When doing "git git log" or some such, do not complain about "git" not
@@ -38,6 +46,9 @@
 	# specify --no-index to search all files, and that submodules are not
 	# searched.
 	ack = grep --extended-regexp --break --heading --line-number
+# end theft
+# from https://github.com/lstrojny/.lars/blob/master/dot-gitconfig
+    graph = log --graph --all --pretty=format:'%Cred%h%Creset - %Cgreen(%cr)%Creset %s%C(yellow)%d%Creset' --abbrev-commit --date=relative
 # end theft
 
 #From https://github.com/gf3/dotfiles/blob/master/.gitconfig
