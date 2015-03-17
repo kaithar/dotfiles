@@ -74,7 +74,23 @@ function ssh-reagent {
   esac
 }
 
-ssh-reagent > /dev/null
+echo "Shell up...\n"
+ssh-reagent # > /dev/null
+
+function gnome_reagent {
+  echo "\ngnome-keyring-daemon says:"
+  gnometest=`gnome-keyring-daemon --start | grep -v SSH_AUTH_SOCK`
+  echo $gnometest
+  eval $gnometest
+  export GNOME_KEYRING_CONTROL
+  export GPG_AGENT_INFO
+}
+
+if [[ ($EUID -eq 0) || ("$USER" == 'root')]]; then
+  echo "\nSkipping gnome-keyring-daemon for root."
+else
+  gnome_reagent
+fi
 
 function title {
   if [[ $TERM == "screen" ]]; then
