@@ -125,6 +125,79 @@ function _-accept-line()
 }
 zle -N accept-line _-accept-line
 
+trap ctrl_c INT
+function ctrl_c() {
+  emulate -L zsh
+  FOO=$PROMPT
+  RFOO=$RPS1
+  PROMPT=$COLLAPSED_PROMPT
+  RPS1=""
+  zle reset-prompt
+  zle -I
+  zle end-of-history
+  echo ""
+  echo "** Trapped CTRL-C"
+  zle -R
+  PROMPT=$FOO
+  RPS1=$RFOO
+  zle kill-buffer
+  zle reset-prompt
+}
+
+F_HG=false
+F_GIT=false
+result=''
+result_bw=''
+
+function collapse_path {
+  dir=${1/$HOME/\~}
+  tree=(${(s:/:)dir})
+  result=''
+  result_bw=''
+  temp=''
+  if [[ $tree[1] == \~* ]] {
+    temp="${~tree[1]}/"
+    result_bw=$tree[1]
+    result=$tree[1]
+    shift tree
+  } else {
+    temp="/"
+  }
+  for dir in $tree; {
+    if [[ -d ${~temp}${dir}/.svn ]] {
+      result+="%B%F{white}/%B%F{magenta}"
+    } elif [[ -d ${~temp}${dir}/.git ]] {
+      F_GIT=true
+      result+="%B%F{white}/%B%F{magenta}"
+    } elif [[ -d ${~temp}${dir}/.hg ]] {
+      F_HG=true
+      result+="%B%F{white}/%B%F{magenta}"
+    } else {
+      result+="%B%F{white}/%B%F{green}"
+    }
+    if (( $#tree <= 3 )) {
+      result+=$dir
+      result_bw+="/$dir"
+      temp+="$dir/"
+      if (( $#tree == 1 )) { break }
+      continue
+    }
+    expn=(a b)
+    part=''
+    i=0
+    until [[ (( ${#expn} == 1 )) || $dir = $expn || $i -gt 99 ]]  do
+      (( i++ ))
+      part+=$dir[$i]
+      expn=($(echo "${~temp}${part}*(-/)"))
+    done
+    result+=$part
+    temp+="$dir/"
+    result_bw+="/$part"
+    shift tree
+  }
+  result+="%b"
+}
+
 function precmd {
 RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   local errno=$?
@@ -138,7 +211,7 @@ RPS1="%B%F{green}%*%B%F{white}" #<-- current time
     RAN=0
   }
   PROMPT_PARTS+=('%{${ESC}[48;5;17m%}%E')
-  PROMPT_LINE="%{${ESC}[0m%}%F{red}#  %B%F{cyan}.%b%F{cyan}---- (%y) ($SHLVL deep) "
+  PROMPT_LINE="%b%{${ESC}[0m%}%F{red}#  %b%F{cyan}╭──────── %y  $SHLVL deep  "
   COLLAPSED_PROMPT_LINE="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
   if [[ ($EUID -eq 0) || ("$USER" == 'root')]] {
     PROMPT_LINE+="%B%F{red}%m%b " #<-- Host
@@ -147,80 +220,41 @@ RPS1="%B%F{green}%*%B%F{white}" #<-- current time
     PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- User @ Host
     COLLAPSED_PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- root@Host
   }
-  PROMPT_LINE+="%2(j.%F{cyan}---- %F{green}%j Jobs ."
-  PROMPT_LINE+="%1(j@%F{cyan}---- %F{green}1 Job @)"
-  PROMPT_LINE+=")%F{cyan}---- "
+  PROMPT_LINE+="%2(j.%F{cyan}──── %F{green}%j Jobs ."
+  PROMPT_LINE+="%1(j@%F{cyan}──── %F{green}1 Job @)"
+  PROMPT_LINE+=")%F{cyan}──── "
 
   PWD=`pwd`
-  dir=${PWD/$HOME/\~}
-  tree=(${(s:/:)dir})
-  result=''
-  result_bw=''
-  temp=''
   F_HG=false
   F_GIT=false
-  if [[ $tree[1] == \~* ]] {
-    temp="${~tree[1]}/"
-    result_bw=$tree[1]
-    result=$tree[1]
-    shift tree
-  } else {
-    temp="/"
-  }
-  for dir in $tree; {
-    if [[ -d ${~temp}${dir}/.svn ]] {
-      result+="%b%F{green}/%B%F{magenta}"
-    } elif [[ -d ${~temp}${dir}/.git ]] {
-      F_GIT=true
-      result+="%b%F{green}/%B%F{magenta}"
-    } elif [[ -d ${~temp}${dir}/.hg ]] {
-      F_HG=true
-      result+="%b%F{green}/%B%F{magenta}"
-    } else {
-      result+="%b%F{green}/%B%F{green}"
-    }
-	if (( $#tree <= 3 )) {
-	  result+=$dir
-      result_bw+="/$dir"
-      temp+="$dir/"
-      if (( $#tree == 1 )) {
-        break
-      }
-      continue
-    }
-    expn=(a b)
-    part=''
-    i=0
-    until [[ (( ${#expn} == 1 )) || $dir = $expn || $i -gt 99 ]]  do
-      (( i++ ))
-      part+=$dir[$i]
-      expn=($(echo "${~temp}${part}*(-/)"))
-    done
-	result+=$part
-    temp+="$dir/"
-    result_bw+="/$part"
-    shift tree
-  }
+  collapse_path $PWD
+
   PROMPT_LINE+=${result:-/}
-  PROMPT_LINE+="%b"
+  PROMPT_LINE+="%b%E"
   COLLAPSED_PROMPT_LINE+=": "${result:-/}
   COLLAPSED_PROMPT_LINE+="%b"
   PROMPT_PARTS+=($PROMPT_LINE)
   COLLAPSED_PROMPT_PARTS+=($COLLAPSED_PROMPT_LINE)
   if [[ -d .svn ]] {
     svn_repo=`head -n 6 .svn/entries | tail -n 1`
-    PROMPT_PARTS+=("%F{red}# %F{cyan}{-----%b %F{green}SVN repo: %F{yellow}${svn_repo}")
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────%b %F{green}SVN repo %F{cyan} %F{yellow}${svn_repo}")
   }
   if ($F_GIT) {
     git_path=`git remote -v |grep fetch|sed -E 's/\t/ /g'|cut -f2 -d' '|sed ':s;N;s/\n/, /;t s;'`
-    PROMPT_PARTS+=('%F{red}# %F{cyan}{-----%b %F{green}Git repo: %F{yellow}${git_path}')
+    guessed_branch=`git branch | sed -n '/\* /s///p'`
+    tracking_branch=`git rev-parse --symbolic-full-name --abbrev-ref @{u}`
+    PROMPT_PARTS+=('%b%F{red}#  %F{cyan}├───────%b %F{green}Git repo %F{cyan} %F{yellow}${git_path} %F{cyan} %F{yellow}${guessed_branch}%F{green} (tracking %F{yellow}${tracking_branch}%F{green})')
   }
   if ($F_HG) {
     hg_path=`hg paths|cut -f3- -d' '`
-    PROMPT_PARTS+=("%F{red}# %F{cyan}{-----%b %F{green}HG repo: %F{yellow}${hg_path}")
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────%b %F{green}HG repo %F{cyan} %F{yellow}${hg_path}")
   }
-  PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}")
-  COLLAPSED_PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}---> %B%F{white}")
+  if [[ -n "$VIRTUAL_ENV" ]] {
+    collapse_path $VIRTUAL_ENV
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├──────%b %F{green}Using Virtualenv %F{cyan} %F{yellow}${result}")
+  }
+  PROMPT_PARTS+=("%b%F{red}#  %b%F{cyan}╰──── %k%b%F{white}")
+  COLLAPSED_PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}----> %B%F{white}")
   PROMPT=${(pj:\n:)PROMPT_PARTS}
   COLLAPSED_PROMPT=${(pj:\n:)COLLAPSED_PROMPT_PARTS}
   title "zsh in $result_bw"
