@@ -42,6 +42,26 @@ RAN=0
 BTICK='\`'
 ESC=`echo "\e"`
 
+if [[ -z $HAVE_POWERLINE ]]; then
+  # This isn't a certain thing, but it's probably good enough.
+  fc-list -q PowerlineSymbols &> /dev/null
+  if [[ $? -eq 0 ]]; then
+    HAVE_POWERLINE=true
+  fi
+fi
+
+# Glyph selection...
+if [[ $HAVE_POWEsRLINE == true ]]; then
+  LT=''
+  GT=''
+  FILLGT=''
+else
+  LT='<'
+  GT='>'
+  FILLGT='>'
+fi
+unset HAVE_POWERLINE # Don't leak this, it gives headaches :p
+
 function _ssh-reagent {
   ls /tmp | grep ssh- 2>&1 > /dev/null
   if [[ $? == 0 ]]; then
@@ -73,6 +93,15 @@ function ssh-reagent {
       ssh-add -l;;
   esac
 }
+
+if [[ $TERM == "" ]]; then
+    # This is actualy a non-interactive terminal btw...
+else
+    if [[ -f ~/.dotfiles/generatemaze.py ]]; then
+        echo "Have some a-maze-ing art..."
+        env python ~/.dotfiles/generatemaze.py 70 15 2>/dev/null
+    fi
+fi
 
 echo "Shell up...\n"
 ssh-reagent # > /dev/null
@@ -199,19 +228,19 @@ function collapse_path {
 }
 
 function precmd {
-RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   local errno=$?
+  RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   PROMPT=""
   typeset -a PROMPT_PARTS
   typeset -a COLLAPSED_PROMPT_PARTS
   COLLAPSED_PROMPT=""
   if [[ ($errno -gt 0) && ($RAN -eq 1)]] {
-    PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>")
-    COLLAPSED_PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}< %F{red}Previous exit status: %? %F{cyan}>")
-    RAN=0
+    PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}${LT} %F{red}Previous exit status: %? %F{cyan}${GT}")
+    COLLAPSED_PROMPT_PARTS+=("%F{red}#   !!! %F{cyan}${LT} %F{red}Previous exit status: %? %F{cyan}${GT}")
   }
+  RAN=0
   PROMPT_PARTS+=('%{${ESC}[48;5;17m%}%E')
-  PROMPT_LINE="%b%{${ESC}[0m%}%F{red}#  %b%F{cyan}╭──────── %y  $SHLVL deep  "
+  PROMPT_LINE="%b%{${ESC}[0m%}%F{red}#  %b%F{cyan}╭────────${LT} %y ${LT} $SHLVL deep ${LT} "
   COLLAPSED_PROMPT_LINE="%F{red}#  %B%F{cyan}.%b%F{cyan}---- "
   if [[ ($EUID -eq 0) || ("$USER" == 'root')]] {
     PROMPT_LINE+="%B%F{red}%m%b " #<-- Host
@@ -220,9 +249,9 @@ RPS1="%B%F{green}%*%B%F{white}" #<-- current time
     PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- User @ Host
     COLLAPSED_PROMPT_LINE+="%B%F{green}%n%F{cyan} @ %B%F{green}%m%b " #<-- root@Host
   }
-  PROMPT_LINE+="%2(j.%F{cyan}──── %F{green}%j Jobs ."
-  PROMPT_LINE+="%1(j@%F{cyan}──── %F{green}1 Job @)"
-  PROMPT_LINE+=")%F{cyan}──── "
+  PROMPT_LINE+="%2(j.%F{cyan}${GT}────${LT} %F{green}%j Jobs ."
+  PROMPT_LINE+="%1(j@%F{cyan}${GT}────${LT} %F{green}1 Job @)"
+  PROMPT_LINE+=")%F{cyan}${GT}────${LT} "
 
   PWD=`pwd`
   F_HG=false
@@ -237,23 +266,23 @@ RPS1="%B%F{green}%*%B%F{white}" #<-- current time
   COLLAPSED_PROMPT_PARTS+=($COLLAPSED_PROMPT_LINE)
   if [[ -d .svn ]] {
     svn_repo=`head -n 6 .svn/entries | tail -n 1`
-    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────%b %F{green}SVN repo %F{cyan} %F{yellow}${svn_repo}")
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────${LT}%b %F{green}SVN repo %F{cyan}${GT} %F{yellow}${svn_repo}")
   }
   if ($F_GIT) {
     git_path=`git remote -v |grep fetch|sed -E 's/\t/ /g'|cut -f2 -d' '|sed ':s;N;s/\n/, /;t s;'`
     guessed_branch=`git branch | sed -n '/\* /s///p'`
     tracking_branch=`git rev-parse --symbolic-full-name --abbrev-ref @{u}`
-    PROMPT_PARTS+=('%b%F{red}#  %F{cyan}├───────%b %F{green}Git repo %F{cyan} %F{yellow}${git_path} %F{cyan} %F{yellow}${guessed_branch}%F{green} (tracking %F{yellow}${tracking_branch}%F{green})')
+    PROMPT_PARTS+=('%b%F{red}#  %F{cyan}├───────${LT}%b %F{green}Git repo %F{cyan}${GT} %F{yellow}${git_path} %F{cyan}${GT} %F{yellow}${guessed_branch}%F{green} (tracking %F{yellow}${tracking_branch}%F{green})')
   }
   if ($F_HG) {
     hg_path=`hg paths|cut -f3- -d' '`
-    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────%b %F{green}HG repo %F{cyan} %F{yellow}${hg_path}")
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├───────${LT}%b %F{green}HG repo %F{cyan}${GT} %F{yellow}${hg_path}")
   }
   if [[ -n "$VIRTUAL_ENV" ]] {
     collapse_path $VIRTUAL_ENV
-    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├──────%b %F{green}Using Virtualenv %F{cyan} %F{yellow}${result}")
+    PROMPT_PARTS+=("%b%F{red}#  %F{cyan}├──────${LT}%b %F{green}Using Virtualenv %F{cyan}${GT} %F{yellow}${result}")
   }
-  PROMPT_PARTS+=("%b%F{red}#  %b%F{cyan}╰──── %k%b%F{white}")
+  PROMPT_PARTS+=("%b%F{red}#  %b%F{cyan}╰────${FILLGT} %k%b%F{white}")
   COLLAPSED_PROMPT_PARTS+=("%F{red}#  %B%F{cyan}$BTICK%b%F{cyan}----> %B%F{white}")
   PROMPT=${(pj:\n:)PROMPT_PARTS}
   COLLAPSED_PROMPT=${(pj:\n:)COLLAPSED_PROMPT_PARTS}
