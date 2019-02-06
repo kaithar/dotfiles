@@ -28,6 +28,13 @@ alias grep='grep --colour=auto'
 alias vi=vim
 alias esed="sed -r"
 
+export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/code
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+
 bindkey "\e[1~" vi-beginning-of-line # Home
 bindkey "\e[2~" list-choices # Insert
 bindkey "\e[3~" vi-delete-char # Delete
@@ -104,7 +111,7 @@ else
 fi
 
 echo "Shell up...\n"
-ssh-reagent # > /dev/null
+#ssh-reagent # > /dev/null
 
 function gnome_reagent {
   echo "\ngnome-keyring-daemon says:"
@@ -118,8 +125,9 @@ function gnome_reagent {
 if [[ ($EUID -eq 0) || ("$USER" == 'root')]]; then
   echo "\nSkipping gnome-keyring-daemon for root."
 else
-  gnome_reagent
+  #gnome_reagent
 fi
+export SSH_AUTH_SOCK="/run/user/$(id -u)/gnupg/S.gpg-agent.ssh"
 
 function title {
   if [[ $TERM == "screen" ]]; then
