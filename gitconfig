@@ -1,5 +1,6 @@
 [user]
-	name = Daniel Bradshaw
+    name = Kaithar
+    email = noreply.committer@the-cell.co.uk
 
 [diff]
 #        external = git_diff_wrapper

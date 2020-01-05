@@ -1,0 +1,8 @@
+*.o
+
+config.json
+*.pid
+*.egg-info
+*.pyc
+__pycache__
+

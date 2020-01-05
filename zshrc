@@ -23,6 +23,22 @@ export LESSOPEN='|~/.lessfilter %s'
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
 setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY EXTENDED_HISTORY transientrprompt
 
+if [ -f /usr/local/bin/antibody ]; then
+    source <(antibody init)
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/docker
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/docker-compose
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/git-extras
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/git-hubflow
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/python
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/salt
+    antibody bundle robbyrussell/oh-my-zsh path:plugins/virtualenvwrapper
+    antibody bundle sharat87/pip-app
+    antibody bundle supercrabtree/k
+    antibody bundle zpm-zsh/figures
+    #antigen bundle unixorn/autoupdate-antigen.zshplugin
+    #antigen apply
+fi
+
 alias ls="ls --color=always"
 alias grep='grep --colour=auto'
 alias vi=vim
@@ -127,7 +143,12 @@ if [[ ($EUID -eq 0) || ("$USER" == 'root')]]; then
 else
   #gnome_reagent
 fi
-export SSH_AUTH_SOCK="/run/user/$(id -u)/gnupg/S.gpg-agent.ssh"
+
+if [[ "$SSH_AUTH_SOCK" == '' ]]; then
+    export SSH_AUTH_SOCK="/run/user/$(id -u)/gnupg/S.gpg-agent.ssh"
+else
+    echo "\nSkipping new SSH agent"
+fi
 
 function title {
   if [[ $TERM == "screen" ]]; then
@@ -297,3 +318,7 @@ function precmd {
   title "zsh in $result_bw"
 }
 
+# This must be at the end
+if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
