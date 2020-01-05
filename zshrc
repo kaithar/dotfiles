@@ -23,6 +23,15 @@ export LESSOPEN='|~/.lessfilter %s'
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
 setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY EXTENDED_HISTORY transientrprompt
 
+if [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
+    path=('/usr/share/virtualenvwrapper' $path)
+    export PATH
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+fi
+
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/code
+
 if [ -f /usr/local/bin/antibody ]; then
     source <(antibody init)
     antibody bundle robbyrussell/oh-my-zsh path:plugins/docker
@@ -31,6 +40,7 @@ if [ -f /usr/local/bin/antibody ]; then
     antibody bundle robbyrussell/oh-my-zsh path:plugins/git-hubflow
     antibody bundle robbyrussell/oh-my-zsh path:plugins/python
     antibody bundle robbyrussell/oh-my-zsh path:plugins/salt
+    # This imports the wrapper if it can find it, but really I'd rather not since it prefers lazy loading
     antibody bundle robbyrussell/oh-my-zsh path:plugins/virtualenvwrapper
     antibody bundle sharat87/pip-app
     antibody bundle supercrabtree/k
@@ -46,10 +56,6 @@ alias esed="sed -r"
 
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
-
-export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/code
-source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 
 bindkey "\e[1~" vi-beginning-of-line # Home
 bindkey "\e[2~" list-choices # Insert
