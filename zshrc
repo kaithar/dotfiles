@@ -49,7 +49,7 @@ if [ -f /usr/local/bin/antibody ]; then
     #antigen apply
 fi
 
-alias ls="ls --color=always"
+alias ls="ls --color=auto"
 alias grep='grep --colour=auto'
 alias vi=vim
 alias esed="sed -r"
@@ -80,7 +80,7 @@ if [[ -z $HAVE_POWERLINE ]]; then
 fi
 
 # Glyph selection...
-if [[ $HAVE_POWEsRLINE == true ]]; then
+if [[ $HAVE_POWERLINE == true ]]; then
   LT=''
   GT=''
   FILLGT=''
