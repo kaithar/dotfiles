@@ -25,6 +25,6 @@ linking vimrc .vimrc
 linking zshrc .zshrc
 #generatemaze.py  gitconfig  htoprc  inputrc  lessfilter  powerline-fonts  README.md  screenrc  ssh  tmux.conf  toprc  vimrc  zshrc
 
-apt install git htop screen tmux vim zsh build-essential zsh-syntax-highlighting
+sudo apt install git htop screen tmux vim zsh build-essential zsh-syntax-highlighting
 
-curl -sfL git.io/antibody | sh -s - -b /usr/local/bin
+curl -sfL git.io/antibody | sudo sh -s - -b /usr/local/bin
