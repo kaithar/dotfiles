@@ -1,0 +1,4 @@
+#! /bin/bash
+
+source ~/.virtualenvs/toybox/bin/activate
+python3 ~/code/dotfiles/bin/zpool_annotated.py

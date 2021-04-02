@@ -23,6 +23,11 @@ export LESSOPEN='|~/.lessfilter %s'
 setopt appendhistory autocd beep extendedglob notify prompt_subst prompt_percent
 setopt extended_history INC_APPEND_HISTORY SHARE_HISTORY EXTENDED_HISTORY transientrprompt
 
+if [ -d ~/code/dotfiles/bin ]; then
+    path=($(realpath -m ~/code/dotfiles/bin) $path)
+    export PATH
+fi
+
 if [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
     path=('/usr/share/virtualenvwrapper' $path)
     export PATH

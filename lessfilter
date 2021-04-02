@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if ! `which pygmentize &>/dev/null`; then
     exit 0
