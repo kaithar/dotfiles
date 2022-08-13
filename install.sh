@@ -16,6 +16,7 @@ mkdir -vp ~/.vim/{backup,tmp,undos}
 linking gitconfig .gitconfig
 linking gitignore_global .gitignore_global
 linking htoprc .htoprc
+linking htoprc .config/htop/htoprc
 linking inputrc .inputrc
 linking lessfilter .lessfilter
 linking screenrc .screenrc

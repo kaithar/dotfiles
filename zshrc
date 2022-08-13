@@ -6,6 +6,9 @@ autoload -Uz compinit
 compinit
 compdef git-achievements=git
 
+autoload -U bashcompinit
+bashcompinit
+
 setopt COMPLETE_IN_WORD
 
 autoload -U colors
@@ -15,7 +18,7 @@ EDITOR=/usr/bin/vim
 HISTFILE=~/.histfile
 HISTSIZE=1000000000
 SAVEHIST=1000000000
-PATH=/usr/lib/colorgcc/bin:$PATH
+PATH=/usr/lib/colorgcc/bin:~/.local/bin:~/.cargo/bin:$PATH
 
 export LESS='-R'
 export LESSOPEN='|~/.lessfilter %s'
@@ -34,8 +37,13 @@ if [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
     source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 fi
 
+
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/code
+
+if [ -f $HOME/.local/bin/register-python-argcomplete ]; then
+    eval "$(register-python-argcomplete pipx)"
+fi
 
 if [ -f /usr/local/bin/antibody ]; then
     source <(antibody init)

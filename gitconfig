@@ -1,6 +1,7 @@
 [user]
     name = Kaithar
     email = noreply.committer@the-cell.co.uk
+	signingkey = 14C6F66EC36669C3
 
 [diff]
 #        external = git_diff_wrapper
@@ -70,3 +71,7 @@
   untracked = cyan
 # end theft
 
+[commit]
+	gpgsign = true
+[log]
+	showSignature = true
